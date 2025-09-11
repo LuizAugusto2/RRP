@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Fornecedores e Rotas</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header>
+    <h1>Sistema de Fornecedores e Rotas</h1>
+    <p>Lucas do Rio Verde - MT</p>
+  </header>
+
+  <div id="topRightPanel"><p id="infoPainel">Nenhum fornecedor selecionado</p></div>
+  <button id="themeToggle"><i class="fas fa-moon"></i></button>
+
+  <main class="container">
+    <section class="form-container">
+      <h2>Cadastro de Fornecedor</h2>
+      <form id="fornecedorForm">
+        <input type="text" id="nome" placeholder="Nome do fornecedor" required/>
+        <input type="text" id="cnpj" placeholder="CNPJ" required/>
+        <input type="text" id="endereco" placeholder="Endereço" required/>
+        <input type="text" id="estado" placeholder="Estado/UF" required/>
+        <button type="submit"><i class="fas fa-plus"></i> Cadastrar Fornecedor</button>
+      </form>
+
+      <h2>Cadastro de Produto</h2>
+      <form id="produtoForm">
+        <select id="fornecedorSelect"></select>
+        <input type="text" id="produtoNome" placeholder="Nome do produto" required/>
+        <input type="text" id="produtoPreco" placeholder="Preço (R$)" required/>
+        <input type="text" id="produtoPagamento" placeholder="Forma de pagamento"/>
+        <button type="submit"><i class="fas fa-plus"></i> Cadastrar Produto</button>
+      </form>
+
+      <h2>Calcular Rota</h2>
+      <form id="rotaForm">
+        <input type="text" id="origem" placeholder="Endereço de origem" required/>
+        <input type="text" id="destino" placeholder="Endereço de destino" required/>
+        <input type="text" id="precoCombustivel" placeholder="Preço do combustível (R$)" required/>
+        <input type="text" id="consumoCarro" placeholder="Km por litro do carro" required/>
+        <input type="text" id="pedagio" placeholder="Pedágio (opcional)"/>
+        <button type="submit"><i class="fas fa-route"></i> Calcular Rota</button>
+      </form>
+      <div id="resultadoRota"></div>
+    </section>
+
+    <section id="map"></section>
+
+    <section class="form-container">
+      <h2>Fornecedores</h2>
+      <div id="fornecedoresCards"></div>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "fornecedores": [
+    {
+      "id": 1,
+      "nome": "Fornecedor A",
+      "cnpj": "00.000.000/0001-00",
+      "endereco": "São Paulo - SP",
+      "estado": "SP",
+      "produtos": [
+        {"nome": "Produto A1", "preco": 10.5, "pagamento": "Dinheiro"},
+        {"nome": "Produto A2", "preco": 15.0, "pagamento": "Cartão"}
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Fornecedor B",
+      "cnpj": "11.111.111/0001-11",
+      "endereco": "Curitiba - PR",
+      "estado": "PR",
+      "produtos": [
+        {"nome": "Produto B1", "preco": 20.0, "pagamento": "Dinheiro"},
+        {"nome": "Produto B2", "preco": 25.0, "pagamento": "Cartão"}
+      ]
+    }
+  ]
+}

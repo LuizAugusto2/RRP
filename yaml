@@ -1,0 +1,27 @@
+fornecedores
+ ├─ fornecedor1
+ │   ├─ nome: "Fornecedor A"
+ │   ├─ cnpj: "00.000.000/0001-00"
+ │   ├─ endereco: "São Paulo - SP"
+ │   └─ estado: "SP"
+ └─ fornecedor2
+     ├─ nome: "Fornecedor B"
+     ├─ cnpj: "11.111.111/0001-11"
+     ├─ endereco: "Curitiba - PR"
+     └─ estado: "PR"
+     
+produtos
+ ├─ fornecedor1
+ │   ├─ produto1
+ │   │   ├─ nome: "Produto 1"
+ │   │   ├─ preco: 10.5
+ │   │   └─ pagamento: "À vista"
+ │   └─ produto2
+ │       ├─ nome: "Produto 2"
+ │       ├─ preco: 25.0
+ │       └─ pagamento: "Parcelado"
+ └─ fornecedor2
+     └─ produtoX
+         ├─ nome: "Produto X"
+         ├─ preco: 15.0
+         └─ pagamento: "À vista"
