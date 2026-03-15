@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BarberPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#C9A84C;--gold2:#F0D080;--bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;--txt:#e8e8e8;--muted:#888;--border:#2a2a2a;--green:#5ecb8e;--blue:#5aa0e6;--red:#e26565}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+#app{display:flex;height:100vh;overflow:hidden}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:transform .25s;z-index:200}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--gold);padding:20px 20px 18px;border-bottom:0.5px solid var(--border)}
+.logo span{color:#fff}
+.logo-sub{font-size:10px;letter-spacing:1px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;margin-top:2px}
+.nav-sec{padding:14px 16px 4px;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:var(--muted);border-left:3px solid transparent;transition:all .18s;user-select:none}
+.nav-item:hover{color:var(--txt);background:rgba(255,255,255,.03)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,.07)}
+.nav-item svg{width:16px;height:16px;opacity:.6;flex-shrink:0}
+.nav-item.active svg{opacity:1}
+.nbadge{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(201,168,76,.15);color:var(--gold)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border-bottom:0.5px solid var(--border);flex-shrink:0;gap:8px}
+.topbar h1{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.topbar p{font-size:11px;color:var(--muted);margin-top:2px}
+.topbar-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .18s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-gold{background:var(--gold);color:#000}.btn-gold:hover{background:var(--gold2)}
+.btn-out{background:transparent;color:var(--txt);border:0.5px solid #444}.btn-out:hover{background:var(--bg3)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8B6914);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#000;flex-shrink:0}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border-radius:8px;background:var(--bg3);border:0.5px solid #444;flex-shrink:0}
+.hamburger span{width:18px;height:2px;background:var(--txt);border-radius:2px}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
+#overlay.show{opacity:1;pointer-events:all}
+.sbar{padding:6px 16px;background:rgba(201,168,76,.06);border-bottom:0.5px solid rgba(201,168,76,.15);font-size:11px;color:var(--gold);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.content{flex:1;overflow-y:auto;padding:16px}
+.panel{display:none}.panel.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.metric{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:14px 16px}
+.metric.acc{border-top:2px solid var(--gold)}
+.m-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.m-val{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px}
+.m-sub{font-size:11px;margin-top:4px}
+.up{color:var(--green)}.dn{color:var(--red)}
+.card{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:16px}
+.ctitle{font-size:13px;font-weight:500;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;display:inline-block}
+.bg{background:rgba(94,203,142,.15);color:var(--green)}
+.ba{background:rgba(201,168,76,.15);color:var(--gold)}
+.bb{background:rgba(90,160,230,.15);color:var(--blue)}
+.bm{background:rgba(255,255,255,.07);color:var(--muted)}
+.br{background:rgba(226,101,101,.15);color:var(--red)}
+.fi{display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:10px;padding:10px 12px;border:0.5px solid var(--border);margin-bottom:8px;transition:border-color .15s}
+.fi.atv{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.05)}
+.fpos{width:30px;height:30px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--muted);flex-shrink:0}
+.fpos.cut{background:var(--gold);color:#000;font-weight:700}
+.finfo{flex:1;min-width:0}
+.fname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fdet{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--bg3);border:0.5px solid var(--border);margin-bottom:7px;font-size:12px}
+.ag.bk{border-color:rgba(201,168,76,.25);background:rgba(201,168,76,.03)}
+.ag.go{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.07)}
+.ag.fr{opacity:.4}
+.ah{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--muted);min-width:46px;flex-shrink:0}
+.ah.g{color:var(--gold)}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.blbl{min-width:40px;color:var(--muted);font-size:11px}
+.btrk{flex:1;height:7px;background:var(--bg3);border-radius:4px}
+.bfil{height:100%;border-radius:4px;background:var(--gold)}
+.bval{min-width:28px;text-align:right;font-size:11px;color:var(--muted)}
+.fg{margin-bottom:12px}
+.flbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:block}
+.finp,.fsel{width:100%;padding:9px 12px;background:var(--bg3);border:0.5px solid #333;border-radius:8px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .18s}
+.finp:focus,.fsel:focus{border-color:var(--gold)}
+.fsel option{background:var(--bg3)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.so{padding:8px 10px;border-radius:8px;border:0.5px solid #333;background:var(--bg3);font-size:12px;cursor:pointer;text-align:center;transition:all .18s}
+.so.sel{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
+.mb{display:flex;align-items:flex-end;gap:4px;height:52px;margin:12px 0}
+.mbar{border-radius:3px 3px 0 0;background:var(--gold);width:14px;opacity:.75}
+.wa-wrap{background:#0a0a0a;border-radius:14px;overflow:hidden;border:0.5px solid var(--border)}
+.wa-head{background:#1f2c34;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.wa-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;flex-shrink:0}
+.wa-hn{font-size:14px;font-weight:500;color:#e9edef}
+.wa-hs{font-size:11px;color:#8696a0;margin-top:1px}
+.wa-body{padding:12px;background:#0b141a;min-height:260px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.wmsg{max-width:85%;padding:8px 12px;border-radius:10px;font-size:12px;line-height:1.6}
+.recv{background:#1f2c34;color:#e9edef;align-self:flex-start;border-radius:0 10px 10px 10px}
+.sent{background:#005c4b;color:#e9edef;align-self:flex-end;border-radius:10px 10px 0 10px}
+.wtime{font-size:10px;color:#8696a0;margin-top:3px;text-align:right}
+.wa-inp{background:#1f2c34;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.wa-inp input{flex:1;background:#2a3942;border:none;border-radius:20px;padding:8px 14px;color:#e9edef;font-size:12px;outline:none;font-family:'DM Sans',sans-serif}
+.wsend{width:36px;height:36px;border-radius:50%;background:#00a884;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wsend svg{width:16px;height:16px;fill:#fff}
+.td-wrap{display:flex;gap:4px;align-items:center;padding:6px 10px}
+.td{width:7px;height:7px;border-radius:50%;background:#8696a0;animation:tda 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tda{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.perm-sec{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:16px;margin-bottom:12px}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;gap:8px}
+.prow:last-child{border:none}
+.tog{width:40px;height:22px;border-radius:11px;cursor:pointer;display:flex;align-items:center;padding:2px;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--green);justify-content:flex-end}
+.tog.off{background:#444;justify-content:flex-start}
+.tok{width:18px;height:18px;border-radius:50%;background:#fff}
+.cbar{display:flex;align-items:flex-end;gap:5px;height:90px}
+.cwrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.cb{width:100%;border-radius:4px 4px 0 0;background:var(--bg3);cursor:pointer;transition:background .15s}
+.cb:hover{background:var(--bg4)}
+.cb.today{background:var(--gold)!important}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--bg2);border-radius:8px;border:0.5px solid var(--border);margin-bottom:14px}
+.tab{flex:1;padding:7px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;color:var(--muted);transition:all .18s}
+.tab.active{background:var(--bg3);color:var(--txt)}
+.barb-card{background:var(--bg2);border-radius:14px;border:0.5px solid var(--border);padding:16px;text-align:center}
+.bav{width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;color:#000}
+.bst{display:flex;justify-content:space-around;padding-top:10px;border-top:0.5px solid var(--border);margin-top:10px}
+.bsv{font-family:'Bebas Neue',sans-serif;font-size:18px}
+.bsl{font-size:10px;color:var(--muted);text-transform:uppercase}
+#toast{position:fixed;bottom:70px;right:16px;background:var(--bg3);border:0.5px solid var(--gold);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--txt);opacity:0;pointer-events:none;transform:translateY(6px);transition:all .28s;z-index:9999;max-width:300px}
+#toast.show{opacity:1;transform:translateY(0)}
+#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:0.5px solid var(--border);z-index:100;padding:4px 0}
+.bnav-items{display:flex;justify-content:space-around}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;cursor:pointer;color:var(--muted);font-size:10px;flex:1;border:none;background:none;transition:color .18s;position:relative}
+.bnav-item.active{color:var(--gold)}
+.bnav-item svg{width:20px;height:20px}
+.bnav-badge{position:absolute;top:3px;right:calc(50% - 18px);background:var(--gold);color:#000;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px}
+.perfil-sw{padding:14px 16px;border-top:0.5px solid var(--border)}
+.perfil-sw p{font-size:11px;color:var(--muted);margin-bottom:8px}
+.perfil-btns{display:flex;gap:6px}
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:768px){
+  #sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #overlay{display:block}
+  .hamburger{display:flex}
+  .topbar p{display:none}
+  .btn-sync{display:none}
+  #bottom-nav{display:block}
+  .content{padding:12px 12px 74px}
+  .metrics{grid-template-columns:repeat(2,1fr);gap:8px}
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .topbar-r .btn-gold{display:none}
+}
+@media(max-width:480px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .m-val{font-size:22px}
+  .g3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<script>
+const CONFIG={WHATSAPP:'5565992119835',LINK:'https://SEU-SITE.com/agendar',BARBEARIA:'BarberPro',PERFIL:'dono'};
+</script>
+
+<div id="app">
+  <nav id="sidebar">
+    <div class="logo">BARBER<span>PRO</span><div class="logo-sub">Sistema de Gestão</div></div>
+    <div class="nav-sec">Principal</div>
+    <div class="nav-item active" onclick="go('dashboard',this);fecharSidebar()"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>Dashboard</div>
+    <div class="nav-item" onclick="go('fila',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M4 6h12M4 10h12M4 14h6" stroke-linecap="round"/></svg>Fila de Espera<span class="nbadge" id="nb-fila">6</span></div>
+    <div class="nav-item" onclick="go('agenda',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="14" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>Agendamentos</div>
+    <div class="nav-sec">Gestão</div>
+    <div class="nav-item" onclick="go('barbeiros',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke-linecap="round"/></svg>Barbeiros</div>
+    <div class="nav-item" onclick="go('relatorios',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M6 14l3-3 3 3 4-5M4 17h12V5H4z" stroke-linecap="round"/></svg>Relatórios</div>
+    <div class="nav-item" onclick="go('servicos',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M9 3H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V9M15 3l2 2-8 8H7v-2L15 3z" stroke-linecap="round"/></svg>Serviços</div>
+    <div class="nav-item" onclick="go('permissoes',this);fecharSidebar()"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="14" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3" stroke-linecap="round"/></svg>Permissões</div>
+    <div class="nav-sec">Integração</div>
+    <div class="nav-item" onclick="go('whatsapp',this);fecharSidebar()"><svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.5 11l-.7.7c-.4.4-1 .5-1.5.3-1-.5-2-1.2-2.7-2-.8-.7-1.5-1.7-2-2.7-.2-.5-.1-1.1.3-1.5l.7-.7c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8 0 1.1l-.3.3c.4.7.9 1.3 1.6 1.6l.3-.3c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8.3 1.1z"/></svg>WhatsApp Bot<span class="nbadge" style="background:rgba(94,203,142,.15);color:var(--green)">ON</span></div>
+    <div style="flex:1"></div>
+    <div class="perfil-sw">
+      <p>Ver como:</p>
+      <div class="perfil-btns">
+        <button class="btn btn-gold" style="flex:1;padding:6px;font-size:11px" onclick="perfil('dono')">Dono</button>
+        <button class="btn btn-out" style="flex:1;padding:6px;font-size:11px" onclick="perfil('cliente')">Cliente</button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="overlay" onclick="fecharSidebar()"></div>
+
+  <div id="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="hamburger" onclick="abrirSidebar()"><span></span><span></span><span></span></div>
+        <div><h1 id="ptitle">DASHBOARD</h1><p>15 de março de 2026</p></div>
+      </div>
+      <div class="topbar-r">
+        <button class="btn btn-out btn-sync" onclick="toast('Sincronizado!')">↻ Sync</button>
+        <button class="btn btn-gold" onclick="go('agenda',document.querySelectorAll('.nav-item')[2])">+ Agendar</button>
+        <div class="avatar">DO</div>
+      </div>
+    </div>
+
+    <div class="sbar">
+      <div class="dot-live"></div>
+      <span>Online · 3 barbeiros · WA <strong style="color:var(--green)">+55 65 99211-9835</strong></span>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="p-dashboard" class="panel active">
+        <div class="metrics">
+          <div class="metric acc"><div class="m-lbl">Faturamento Hoje</div><div class="m-val" style="color:var(--gold)">R$784</div><div class="m-sub up">▲ 18% vs ontem</div></div>
+          <div class="metric"><div class="m-lbl">Clientes Hoje</div><div class="m-val">23</div><div class="m-sub up">▲ 5 a mais</div></div>
+          <div class="metric"><div class="m-lbl">Na Fila Agora</div><div class="m-val" id="d-fila">6</div><div class="m-sub" style="color:var(--gold)">≈40min</div></div>
+          <div class="metric"><div class="m-lbl">Ticket Médio</div><div class="m-val">R$34</div><div class="m-sub dn">▼ 2%</div></div>
+        </div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <div><div class="ctitle" style="margin:0">Faturamento Semanal</div><div style="font-size:11px;color:var(--muted)">Últimos 7 dias</div></div>
+              <span class="badge bg">+12%</span>
+            </div>
+            <div class="cbar" id="cbar"></div>
+            <div style="display:flex;gap:4px;margin-top:5px" id="clbl"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Serviços Mais Vendidos</div>
+            <div class="brow"><span class="blbl">Corte</span><div class="btrk"><div class="bfil" style="width:45%"></div></div><span class="bval" style="color:var(--gold)">45%</span></div>
+            <div class="brow"><span class="blbl">Barba</span><div class="btrk"><div class="bfil" style="width:22%;background:var(--blue)"></div></div><span class="bval" style="color:var(--blue)">22%</span></div>
+            <div class="brow"><span class="blbl">Combo</span><div class="btrk"><div class="bfil" style="width:14%;background:var(--green)"></div></div><span class="bval" style="color:var(--green)">14%</span></div>
+            <div class="brow"><span class="blbl">Outros</span><div class="btrk"><div class="bfil" style="width:19%;background:#555"></div></div><span class="bval">19%</span></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="ctitle">Próximos Atendimentos</div>
+            <div class="fi atv"><div class="fpos cut">✂</div><div class="finfo"><div class="fname">Carlos Mendes</div><div class="fdet">Corte + Barba · Lucas</div></div><span class="badge bg">Atendendo</span></div>
+            <div class="fi"><div class="fpos">2</div><div class="finfo"><div class="fname">Ricardo Alves</div><div class="fdet">Corte · João</div></div><span style="font-size:11px;color:var(--muted)">≈15min</span></div>
+            <div class="fi"><div class="fpos">3</div><div class="finfo"><div class="fname">Marcos Lima</div><div class="fdet">Barba · Pedro</div></div><span style="font-size:11px;color:var(--muted)">≈30min</span></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Horários de Pico</div>
+            <div class="brow"><span class="blbl">9h</span><div class="btrk"><div class="bfil" style="width:35%;opacity:.5"></div></div><span class="bval">35%</span></div>
+            <div class="brow"><span class="blbl">11h</span><div class="btrk"><div class="bfil" style="width:90%"></div></div><span class="bval" style="color:var(--gold)">90%</span></div>
+            <div class="brow"><span class="blbl">14h</span><div class="btrk"><div class="bfil" style="width:80%"></div></div><span class="bval">80%</span></div>
+            <div class="brow"><span class="blbl">17h</span><div class="btrk"><div class="bfil" style="width:85%"></div></div><span class="bval">85%</span></div>
+            <div class="brow"><span class="blbl">18h</span><div class="btrk"><div class="bfil" style="width:70%"></div></div><span class="bval">70%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA -->
+      <div id="p-fila" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Fila de Espera</div><div style="font-size:11px;color:var(--muted)">Tempo médio: 22min</div></div>
+          <button class="btn btn-gold" onclick="addFila()">+ Adicionar</button>
+        </div>
+        <div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:16px;border-color:rgba(201,168,76,.2)">
+          <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Total</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);line-height:1" id="f-total">6</span>
+          <div style="flex:1"></div>
+          <span style="font-size:11px;color:var(--muted)">Máx: <span style="color:var(--gold)">≈55min</span></span>
+        </div>
+        <div class="g2">
+          <div id="f-lista">
+            <div class="fi atv"><div class="fpos cut">✂</div><div class="finfo"><div class="fname">Carlos Mendes</div><div class="fdet">Corte + Barba · Lucas · 14:10</div></div><span class="badge bg">Atendendo</span><button class="btn btn-out" style="padding:4px 8px;font-size:11px;margin-left:6px;flex-shrink:0" onclick="concluir(this,'Carlos Mendes')">✓</button></div>
+            <div class="fi"><div class="fpos">2</div><div class="finfo"><div class="fname">Ricardo Alves</div><div class="fdet">Corte · João · 14:05</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈15min</span><span class="badge ba">Aguardando</span></div>
+            <div class="fi"><div class="fpos">3</div><div class="finfo"><div class="fname">Marcos Lima</div><div class="fdet">Barba · Pedro · 14:15</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈28min</span><span class="badge bm">Na fila</span></div>
+            <div class="fi"><div class="fpos">4</div><div class="finfo"><div class="fname">Felipe Santos</div><div class="fdet">Corte · 14:22</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈36min</span><span class="badge bm">Na fila</span></div>
+            <div class="fi"><div class="fpos">5</div><div class="finfo"><div class="fname">André Costa</div><div class="fdet">Combo · Lucas · 14:28</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈44min</span><span class="badge bm">Na fila</span></div>
+            <div class="fi"><div class="fpos">6</div><div class="finfo"><div class="fname">Thiago Reis</div><div class="fdet">Corte · 14:35</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈55min</span><span class="badge bm">Na fila</span></div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="ctitle">Barbeiros Agora</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8B6914);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0">LC</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Lucas</div><div style="font-size:11px;color:var(--muted)">Ocupado · 12min</div></div><span class="badge ba">Ocupado</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#2060a0);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">JO</div><div style="flex:1"><div style="font-size:13px;font-weight:500">João</div><div style="font-size:11px;color:var(--muted)">Ocupado · 8min</div></div><span class="badge ba">Ocupado</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),#2a8a55);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">PE</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Pedro</div><div style="font-size:11px;color:var(--green)">Disponível</div></div><span class="badge bg">Livre</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ctitle">WhatsApp Hoje</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold)">18</div>
+              <div style="font-size:11px;color:var(--muted);margin:4px 0 12px">Confirmações: 15 · Lembretes: 3</div>
+              <button class="btn btn-out" style="width:100%;font-size:12px" onclick="toast('Lembrete enviado!')">Enviar lembrete geral</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENDA -->
+      <div id="p-agenda" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Agendamentos</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-out" style="padding:6px 10px">◀</button>
+            <button class="btn btn-out" style="color:var(--gold);border-color:rgba(201,168,76,.4);padding:6px 10px">Hoje</button>
+            <button class="btn btn-out" style="padding:6px 10px">▶</button>
+          </div>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="tabs">
+              <div class="tab active" onclick="stab(this)">Todos</div>
+              <div class="tab" onclick="stab(this)">Lucas</div>
+              <div class="tab" onclick="stab(this)">João</div>
+              <div class="tab" onclick="stab(this)">Pedro</div>
+            </div>
+            <div id="ag-list">
+              <div class="ag"><span class="ah">09:00</span><span style="flex:1;font-weight:500">Carlos Mendes</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Corte · Lucas</span><span class="badge bg">Concluído</span></div>
+              <div class="ag"><span class="ah">09:30</span><span style="flex:1;font-weight:500">Rafael Nunes</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Corte · João</span><span class="badge bg">Concluído</span></div>
+              <div class="ag"><span class="ah">10:00</span><span style="flex:1;font-weight:500">Gustavo Pires</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Barba · Pedro</span><span class="badge bg">Concluído</span></div>
+              <div class="ag go"><span class="ah g">14:10</span><span style="flex:1;font-weight:500;color:var(--gold)">Carlos Mendes</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Combo · Lucas</span><span class="badge ba">Andamento</span></div>
+              <div class="ag bk"><span class="ah">15:00</span><span style="flex:1;font-weight:500">Ricardo Alves</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Corte · João</span><span class="badge bb">Confirmado</span></div>
+              <div class="ag bk"><span class="ah">15:30</span><span style="flex:1;font-weight:500">Marcos Lima</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Barba · Pedro</span><span class="badge bb">Confirmado</span></div>
+              <div class="ag fr" id="slot-livre"><span class="ah">16:00</span><span style="flex:1;color:var(--muted)">— Livre —</span><span class="badge bm">Disponível</span></div>
+              <div class="ag bk"><span class="ah">17:00</span><span style="flex:1;font-weight:500">Felipe Santos</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Corte</span><span class="badge bb">Confirmado</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);margin-bottom:14px">+ Novo Agendamento</div>
+            <div class="fg"><label class="flbl">Nome do Cliente</label><input class="finp" type="text" placeholder="Nome completo" id="ag-nome"></div>
+            <div class="fg"><label class="flbl">WhatsApp</label><input class="finp" type="tel" placeholder="(65) 99999-0000"></div>
+            <div class="fg"><label class="flbl">Barbeiro</label><select class="fsel"><option>Qualquer</option><option>Lucas</option><option>João</option><option>Pedro</option></select></div>
+            <label class="flbl">Serviço</label>
+            <div class="sg">
+              <div class="so sel" onclick="ssel(this)">✂ Corte<br><small style="color:var(--muted)">R$30</small></div>
+              <div class="so" onclick="ssel(this)">🧔 Barba<br><small style="color:var(--muted)">R$25</small></div>
+              <div class="so" onclick="ssel(this)">✂🧔 Combo<br><small style="color:var(--muted)">R$50</small></div>
+              <div class="so" onclick="ssel(this)">✨ Hidrat.<br><small style="color:var(--muted)">R$40</small></div>
+            </div>
+            <div class="fg"><label class="flbl">Horário</label><select class="fsel"><option>16:00 — Livre</option><option>18:00</option><option>18:30</option></select></div>
+            <button class="btn btn-gold" style="width:100%;padding:11px" onclick="confirmarAg()">Confirmar Agendamento</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BARBEIROS -->
+      <div id="p-barbeiros" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Barbeiros</div>
+          <button class="btn btn-gold" onclick="toast('Novo barbeiro!')">+ Novo</button>
+        </div>
+        <div class="g3" style="margin-bottom:16px">
+          <div class="barb-card"><div class="bav" style="background:linear-gradient(135deg,var(--gold),#8B6914)">LC</div><div style="font-size:14px;font-weight:500;margin-bottom:4px">Lucas Carvalho</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px">Clássicos · 40%</div><span class="badge ba">Ocupado</span><div class="bst"><div><div class="bsv" style="color:var(--gold)">8</div><div class="bsl">Hoje</div></div><div><div class="bsv">52</div><div class="bsl">Semana</div></div><div><div class="bsv" style="color:var(--gold)">4.9</div><div class="bsl">Nota</div></div></div></div>
+          <div class="barb-card"><div class="bav" style="background:linear-gradient(135deg,var(--blue),#2060a0)">JO</div><div style="font-size:14px;font-weight:500;margin-bottom:4px">João Oliveira</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px">Barbas · 40%</div><span class="badge ba">Ocupado</span><div class="bst"><div><div class="bsv" style="color:var(--blue)">9</div><div class="bsl">Hoje</div></div><div><div class="bsv">61</div><div class="bsl">Semana</div></div><div><div class="bsv" style="color:var(--gold)">4.8</div><div class="bsl">Nota</div></div></div></div>
+          <div class="barb-card" style="border-color:rgba(94,203,142,.2)"><div class="bav" style="background:linear-gradient(135deg,var(--green),#2a8a55)">PE</div><div style="font-size:14px;font-weight:500;margin-bottom:4px">Pedro Souza</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px">Modernos · 40%</div><span class="badge bg">Disponível</span><div class="bst"><div><div class="bsv" style="color:var(--green)">6</div><div class="bsl">Hoje</div></div><div><div class="bsv">44</div><div class="bsl">Semana</div></div><div><div class="bsv" style="color:var(--gold)">4.7</div><div class="bsl">Nota</div></div></div></div>
+        </div>
+        <div class="card">
+          <div class="ctitle">Comparativo Semanal</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Lucas</span><span style="color:var(--gold)">R$1.820 · com. R$728</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:85%;height:100%;background:var(--gold);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">João</span><span style="color:var(--blue)">R$2.135 · com. R$854</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:100%;height:100%;background:var(--blue);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--muted)">Pedro</span><span style="color:var(--green)">R$1.540 · com. R$616</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:72%;height:100%;background:var(--green);border-radius:4px"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATÓRIOS -->
+      <div id="p-relatorios" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Relatórios</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="fsel" style="width:auto;padding:7px 10px;font-size:12px"><option>Março 2026</option><option>Fevereiro 2026</option></select>
+            <button class="btn btn-gold" onclick="exp('completo')">Exportar Tudo</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+          <div class="metric acc"><div class="m-lbl">Fat. Março</div><div class="m-val">R$9.840</div><div class="m-sub up">▲ 23%</div></div>
+          <div class="metric"><div class="m-lbl">Clientes</div><div class="m-val">289</div><div class="m-sub up">▲ 31</div></div>
+          <div class="metric"><div class="m-lbl">Novos</div><div class="m-val">42</div><div class="m-sub" style="color:var(--blue)">▲ 14%</div></div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="ctitle">Faturamento Diário</div><div class="mb"><div class="mbar" style="height:30px"></div><div class="mbar" style="height:46px"></div><div class="mbar" style="height:38px"></div><div class="mbar" style="height:52px"></div><div class="mbar" style="height:28px;opacity:.5"></div><div class="mbar" style="height:44px"></div><div class="mbar" style="height:56px"></div></div><div style="display:flex;gap:6px"><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('excel-diario')">📊 Excel</button><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('pdf-diario')">📄 CSV</button></div></div>
+          <div class="card"><div class="ctitle">Por Barbeiro</div><div style="display:flex;gap:6px;height:54px;align-items:flex-end;margin:10px 0"><div style="flex:1;text-align:center"><div style="height:38px;background:var(--gold);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Lucas</div></div><div style="flex:1;text-align:center"><div style="height:50px;background:var(--blue);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:3px">João</div></div><div style="flex:1;text-align:center"><div style="height:34px;background:var(--green);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Pedro</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('excel-barbeiro')">📊 Excel</button><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('pdf-barbeiro')">📄 CSV</button></div></div>
+          <div class="card"><div class="ctitle">Serviços</div><div class="brow"><span class="blbl">Corte</span><div class="btrk"><div class="bfil" style="width:45%"></div></div><span class="bval" style="color:var(--gold)">45%</span></div><div class="brow"><span class="blbl">Barba</span><div class="btrk"><div class="bfil" style="width:22%;background:var(--blue)"></div></div><span class="bval" style="color:var(--blue)">22%</span></div><div class="brow"><span class="blbl">Combo</span><div class="btrk"><div class="bfil" style="width:14%;background:var(--green)"></div></div><span class="bval" style="color:var(--green)">14%</span></div><div style="display:flex;gap:6px;margin-top:8px"><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('excel-servicos')">📊 Excel</button><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('pdf-servicos')">📄 CSV</button></div></div>
+          <div class="card"><div class="ctitle">Histórico</div><div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:0.5px solid var(--border)"><span style="color:var(--muted)">Carlos Mendes</span><span>8x · R$320</span></div><div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:0.5px solid var(--border)"><span style="color:var(--muted)">Ricardo Alves</span><span>5x · R$175</span></div><div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0"><span style="color:var(--muted)">Marcos Lima</span><span>3x · R$75</span></div></div><div style="display:flex;gap:6px"><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('excel-historico')">📊 Excel</button><button class="btn btn-out" style="flex:1;padding:7px;font-size:11px" onclick="exp('pdf-historico')">📄 CSV</button></div></div>
+        </div>
+      </div>
+
+      <!-- SERVIÇOS -->
+      <div id="p-servicos" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Serviços</div>
+          <button class="btn btn-gold" onclick="toast('Novo serviço!')">+ Adicionar</button>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:380px">
+            <thead><tr style="border-bottom:0.5px solid var(--border)"><th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase">Serviço</th><th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px">Dur.</th><th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px">Preço</th><th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px">Vendas</th><th></th></tr></thead>
+            <tbody>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:10px 0;font-weight:500">✂ Corte</td><td style="padding:10px 0;color:var(--muted)">20min</td><td style="padding:10px 0;color:var(--gold)">R$30</td><td style="padding:10px 0"><span class="badge bg">130</span></td><td style="padding:10px 0;text-align:right"><button class="btn btn-out" style="padding:4px 8px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:10px 0;font-weight:500">🧔 Barba</td><td style="padding:10px 0;color:var(--muted)">15min</td><td style="padding:10px 0;color:var(--gold)">R$25</td><td style="padding:10px 0"><span class="badge bb">63</span></td><td style="padding:10px 0;text-align:right"><button class="btn btn-out" style="padding:4px 8px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:10px 0;font-weight:500">✂🧔 Combo</td><td style="padding:10px 0;color:var(--muted)">35min</td><td style="padding:10px 0;color:var(--gold)">R$50</td><td style="padding:10px 0"><span class="badge ba">40</span></td><td style="padding:10px 0;text-align:right"><button class="btn btn-out" style="padding:4px 8px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:10px 0;font-weight:500">✨ Hidratação</td><td style="padding:10px 0;color:var(--muted)">25min</td><td style="padding:10px 0;color:var(--gold)">R$40</td><td style="padding:10px 0"><span class="badge bm">18</span></td><td style="padding:10px 0;text-align:right"><button class="btn btn-out" style="padding:4px 8px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr><td style="padding:10px 0;font-weight:500">🎨 Coloração</td><td style="padding:10px 0;color:var(--muted)">60min</td><td style="padding:10px 0;color:var(--gold)">R$80</td><td style="padding:10px 0"><span class="badge bm">12</span></td><td style="padding:10px 0;text-align:right"><button class="btn btn-out" style="padding:4px 8px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PERMISSÕES -->
+      <div id="p-permissoes" class="panel">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:4px">Permissões</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Controle o que cada perfil pode ver</div>
+        <div class="perm-sec">
+          <div style="font-size:14px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px"><span>👤</span>Cliente — só vê</div>
+          <div class="prow"><span>Tela de Agendamento</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Fila (somente sua posição)</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Barbeiros disponíveis</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Dashboard / faturamento</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Relatórios</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+        <div class="perm-sec">
+          <div style="font-size:14px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px"><span>✂</span>Barbeiro — parcial</div>
+          <div class="prow"><span>Agenda do dia (somente a dele)</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Fila completa</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Seu faturamento</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Atualizar status</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Fat. outros barbeiros</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+        <div class="perm-sec" style="border-color:rgba(201,168,76,.25)">
+          <div style="font-size:14px;font-weight:500;margin-bottom:10px;color:var(--gold);display:flex;align-items:center;gap:8px"><span>👑</span>Dono — acesso total</div>
+          <div class="prow"><span>Dashboard completo</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Todos os agendamentos</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Faturamento geral</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Relatórios + exportar</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Gerenciar barbeiros</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Configurar WhatsApp Bot</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div id="p-whatsapp" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">WhatsApp Bot</div>
+          <span class="badge bg" style="font-size:12px;padding:5px 12px">Conectado</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Número: <strong style="color:var(--gold)">+55 65 99211-9835</strong> · Provider: Z-API</div>
+        <div class="g2">
+          <div>
+            <div class="wa-wrap">
+              <div class="wa-head"><div class="wa-av">BP</div><div><div class="wa-hn">BarberPro</div><div class="wa-hs">online · 65992119835</div></div></div>
+              <div class="wa-body" id="wa-chat">
+                <div class="wmsg recv">Olá! 👋 Bem-vindo à <strong>BarberPro</strong>! 💈<br><br>Escolha uma opção:<br><br>1️⃣ Agendar horário<br>2️⃣ Ver minha fila<br>3️⃣ Barbeiros disponíveis<br>4️⃣ Cancelar agendamento<br>5️⃣ Falar com atendente<br><br><em>Responda com o número</em><div class="wtime">agora ✓✓</div></div>
+              </div>
+              <div class="wa-inp">
+                <input type="text" id="wa-in" placeholder="Teste: oi, 1, 2, 3, 4, 5..." onkeydown="if(event.key==='Enter')waSend()">
+                <button class="wsend" onclick="waSend()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="card">
+              <div class="ctitle">Link do Site</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:-6px;margin-bottom:10px">O bot envia este link ao agendar</div>
+              <input class="finp" type="text" id="link-in" value="https://SEU-SITE.com/agendar">
+              <button class="btn btn-gold" style="width:100%;margin-top:8px;padding:9px" onclick="salvarLink()">Salvar Link</button>
+            </div>
+            <div class="card">
+              <div class="ctitle">Estatísticas Hoje</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:var(--bg3);padding:10px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold)">94</div><div style="font-size:10px;color:var(--muted)">Msgs</div></div>
+                <div style="background:var(--bg3);padding:10px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--green)">18</div><div style="font-size:10px;color:var(--muted)">Agendamentos</div></div>
+                <div style="background:var(--bg3);padding:10px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blue)">98%</div><div style="font-size:10px;color:var(--muted)">Uptime</div></div>
+                <div style="background:var(--bg3);padding:10px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px">3s</div><div style="font-size:10px;color:var(--muted)">Resp. média</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="bnav-items">
+    <button class="bnav-item active" onclick="go('dashboard',null);bnav(this)"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>Início</button>
+    <button class="bnav-item" onclick="go('fila',null);bnav(this)"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M4 6h12M4 10h12M4 14h6" stroke-linecap="round"/></svg>Fila<span class="bnav-badge" id="nb-fila-b">6</span></button>
+    <button class="bnav-item" onclick="go('agenda',null);bnav(this)"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="14" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>Agenda</button>
+    <button class="bnav-item" onclick="go('relatorios',null);bnav(this)"><svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M6 14l3-3 3 3 4-5M4 17h12V5H4z" stroke-linecap="round"/></svg>Relatórios</button>
+    <button class="bnav-item" onclick="go('whatsapp',null);bnav(this)"><svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.5 11l-.7.7c-.4.4-1 .5-1.5.3-1-.5-2-1.2-2.7-2-.8-.7-1.5-1.7-2-2.7-.2-.5-.1-1.1.3-1.5l.7-.7c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8 0 1.1l-.3.3c.4.7.9 1.3 1.6 1.6l.3-.3c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8.3 1.1z"/></svg>WhatsApp</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const dias=['Seg','Ter','Qua','Qui','Sex','Sab','Dom'],vals=[620,480,710,550,840,980,784],mx=Math.max(...vals);
+const cbEl=document.getElementById('cbar'),clEl=document.getElementById('clbl');
+dias.forEach((d,i)=>{
+  const h=Math.round((vals[i]/mx)*86);
+  cbEl.innerHTML+=`<div class="cwrap"><div class="cb${i===6?' today':''}" style="height:${h}px" title="R$${vals[i]}" onclick="toast('${d}: R$${vals[i]}')"></div></div>`;
+  clEl.innerHTML+=`<div style="flex:1;text-align:center;font-size:10px;color:${i===6?'var(--gold)':'var(--muted)'}">${d}</div>`;
+});
+function go(p,el){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('p-'+p).classList.add('active');
+  if(el)el.classList.add('active');
+  const t={dashboard:'DASHBOARD',fila:'FILA DE ESPERA',agenda:'AGENDAMENTOS',barbeiros:'BARBEIROS',relatorios:'RELATÓRIOS',servicos:'SERVIÇOS',permissoes:'PERMISSÕES',whatsapp:'WHATSAPP BOT'};
+  document.getElementById('ptitle').textContent=t[p]||p.toUpperCase();
+}
+function bnav(el){document.querySelectorAll('.bnav-item').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
+function abrirSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function fecharSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function perfil(p){
+  if(p==='cliente'){
+    toast('Modo CLIENTE');
+    document.querySelectorAll('.nav-sec').forEach(s=>s.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(item=>{const txt=item.textContent.trim();item.style.display=(txt.includes('Fila')||txt.includes('Agendamentos'))?'flex':'none';});
+    go('fila',null);
+  } else {
+    toast('Modo DONO — acesso total');
+    document.querySelectorAll('.nav-sec').forEach(s=>s.style.display='');
+    document.querySelectorAll('.nav-item').forEach(item=>item.style.display='flex');
+    const p=document.querySelectorAll('.nav-item')[0];go('dashboard',p);p.classList.add('active');
+  }
+  fecharSidebar();
+}
+let fc=6;
+function updFc(){['f-total','d-fila','nb-fila','nb-fila-b'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=fc;})}
+function addFila(){
+  const n=prompt('Nome do cliente:');if(!n)return;fc++;updFc();
+  const l=document.getElementById('f-lista'),d=document.createElement('div');
+  d.className='fi';d.innerHTML=`<div class="fpos">${fc}</div><div class="finfo"><div class="fname">${n}</div><div class="fdet">Aguardando · agora</div></div><span style="font-size:11px;color:var(--muted);margin-right:6px;flex-shrink:0">≈${fc*9}min</span><span class="badge bm">Na fila</span>`;
+  l.appendChild(d);toast(`${n} entrou na fila (#${fc})!`);
+}
+function concluir(btn,n){
+  const item=btn.closest('.fi');item.style.opacity='0';item.style.transition='opacity .3s';
+  setTimeout(()=>{item.remove();fc=Math.max(0,fc-1);updFc();},300);
+  toast(`${n} concluído!`);
+}
+function ssel(el){document.querySelectorAll('.so').forEach(s=>s.classList.remove('sel'));el.classList.add('sel')}
+function stab(el){el.parentNode.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active')}
+function confirmarAg(){
+  const n=document.getElementById('ag-nome').value.trim();if(!n){toast('Preencha o nome!');return;}
+  const sl=document.getElementById('slot-livre');
+  if(sl){const d=document.createElement('div');d.className='ag bk';d.innerHTML=`<span class="ah">16:00</span><span style="flex:1;font-weight:500">${n}</span><span style="color:var(--muted);font-size:11px;margin-right:6px">Corte</span><span class="badge bb">Confirmado</span>`;sl.replaceWith(d);}
+  document.getElementById('ag-nome').value='';toast(`Agendado para ${n}!`);
+}
+function exp(tipo){
+  const d=new Date().toLocaleDateString('pt-BR');let csv='',nome='';
+  if(tipo.includes('barbeiro')||tipo==='completo'){nome='relatorio_barbeiros';csv='Barbeiro,Atendimentos,Faturamento,Comissao\nLucas,52,1820,728\nJoao,61,2135,854\nPedro,44,1540,616\nGerado:,'+d+'\n';}
+  else if(tipo.includes('diario')){nome='faturamento_diario';csv='Data,Clientes,Faturamento\n13/03,23,784\n12/03,21,720\nGerado:,'+d+'\n';}
+  else if(tipo.includes('servicos')){nome='servicos';csv='Servico,Qtd,Receita\nCorte,130,3900\nBarba,63,1575\nGerado:,'+d+'\n';}
+  else{nome='historico_clientes';csv='Cliente,Visitas,Total\nCarlos,8,320\nRicardo,5,175\nGerado:,'+d+'\n';}
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=nome+'.csv';a.click();URL.revokeObjectURL(url);
+  toast(nome+'.csv baixado!');
+}
+function tog(el){const on=el.classList.contains('on');el.classList.toggle('on',!on);el.classList.toggle('off',on);toast(on?'Permissão desativada':'Permissão ativada');}
+function salvarLink(){const v=document.getElementById('link-in').value.trim();if(!v){toast('Digite o link!');return;}CONFIG.LINK=v;toast('Link salvo: '+v);}
+function menuMsg(){return`Olá! 👋 Bem-vindo à *BarberPro*! 💈\n\n1️⃣ Agendar\n2️⃣ Ver fila\n3️⃣ Barbeiros\n4️⃣ Cancelar\n5️⃣ Atendente`;}
+const bot={'oi':menuMsg,'olá':menuMsg,'ola':menuMsg,'bom dia':menuMsg,'boa tarde':menuMsg,'boa noite':menuMsg,'menu':menuMsg,'ajuda':menuMsg,'hello':menuMsg,
+  '1':()=>`📅 *Agendar*\n\nAcesse:\n👉 ${CONFIG.LINK} 😊`,
+  '2':()=>`📊 *Sua posição:*\n🔢 Posição: *3*\n⏱ ≈28min\n👨 Lucas · ✂ Corte`,
+  '3':()=>`👨 *Barbeiros:*\n🟢 Lucas — Livre\n🔴 João — Ocupado\n🔴 Pedro — Ocupado\n\n👉 ${CONFIG.LINK}`,
+  '4':()=>`❓ *Cancelar?*\n📅 Hoje 15:00 · Lucas\n\n✅ SIM · ❌ NÃO`,
+  '5':()=>`💬 Atendente em breve!\nSeg–Sex: 8h–20h`,
+  'sim':()=>`❌ *Cancelado!*\n👉 ${CONFIG.LINK} 💈`,
+  'nao':()=>`✅ *Mantido!* Te esperamos! 💈`,
+  'não':()=>`✅ *Mantido!* Te esperamos! 💈`,
+};
+function waSend(){
+  const inp=document.getElementById('wa-in'),txt=inp.value.trim();if(!txt)return;
+  const chat=document.getElementById('wa-chat');
+  chat.innerHTML+=`<div class="wmsg sent">${txt}<div class="wtime">agora ✓✓</div></div>`;
+  inp.value='';chat.scrollTop=99999;
+  const typing=document.createElement('div');typing.className='wmsg recv';
+  typing.innerHTML='<div class="td-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  chat.appendChild(typing);chat.scrollTop=99999;
+  setTimeout(()=>{
+    typing.remove();
+    const fn=bot[txt.toLowerCase().trim()];
+    const resp=fn?fn():`Não entendi 😅\n\nDigite *menu* ou:\n👉 ${CONFIG.LINK}`;
+    const html=resp.replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>');
+    chat.innerHTML+=`<div class="wmsg recv">${html}<div class="wtime">agora ✓✓</div></div>`;
+    chat.scrollTop=99999;
+  },1000);
+}
+let tt;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>
