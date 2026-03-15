@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BarberPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script>
+const CONFIG = {
+  WHATSAPP: '5565992119835',
+  LINK: 'https://SEU-SITE.com/agendar', // TROQUE PELO SEU LINK
+  BARBEARIA: 'BarberPro',
+  PERFIL: 'dono'
+};
+</script>
+
+<div id="app">
+
+  <!-- ========== SIDEBAR ========== -->
+  <nav id="sidebar">
+    <div class="logo">BARBER<span>PRO</span><div class="logo-sub">Sistema de Gestão</div></div>
+
+    <div class="nav-sec">Principal</div>
+    <div class="nav-item active" onclick="go('dashboard',this)">
+      <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="go('fila',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M4 6h12M4 10h12M4 14h6" stroke-linecap="round"/></svg>
+      Fila de Espera<span class="nbadge" id="nb-fila">6</span>
+    </div>
+    <div class="nav-item" onclick="go('agenda',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="14" height="14" rx="2"/><path d="M7 2v4M13 2v4M3 9h14" stroke-linecap="round"/></svg>
+      Agendamentos
+    </div>
+
+    <div class="nav-sec">Gestão</div>
+    <div class="nav-item" onclick="go('barbeiros',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke-linecap="round"/></svg>
+      Barbeiros
+    </div>
+    <div class="nav-item" onclick="go('relatorios',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M6 14l3-3 3 3 4-5M4 17h12V5H4z" stroke-linecap="round"/></svg>
+      Relatórios
+    </div>
+    <div class="nav-item" onclick="go('servicos',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><path d="M9 3H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V9M15 3l2 2-8 8H7v-2L15 3z" stroke-linecap="round"/></svg>
+      Serviços
+    </div>
+    <div class="nav-item" onclick="go('permissoes',this)">
+      <svg fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="14" height="9" rx="2"/><path d="M7 9V6a3 3 0 016 0v3" stroke-linecap="round"/></svg>
+      Permissões
+    </div>
+
+    <div class="nav-sec">Integração</div>
+    <div class="nav-item" onclick="go('whatsapp',this)">
+      <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.5 11l-.7.7c-.4.4-1 .5-1.5.3-1-.5-2-1.2-2.7-2-.8-.7-1.5-1.7-2-2.7-.2-.5-.1-1.1.3-1.5l.7-.7c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8 0 1.1l-.3.3c.4.7.9 1.3 1.6 1.6l.3-.3c.3-.3.8-.3 1.1 0l.9.9c.3.3.3.8.3 1.1z"/></svg>
+      WhatsApp Bot<span class="nbadge" style="background:rgba(94,203,142,.15);color:var(--green)">ON</span>
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="padding:14px 16px;border-top:0.5px solid var(--border)">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Ver como:</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-gold" style="flex:1;padding:6px;font-size:11px" onclick="perfil('dono')">Dono</button>
+        <button class="btn btn-out" style="flex:1;padding:6px;font-size:11px" onclick="perfil('cliente')">Cliente</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== MAIN ========== -->
+  <div id="main">
+
+    <div class="topbar">
+      <div><h1 id="ptitle">DASHBOARD</h1><p>Sexta-feira, 13 de março de 2026</p></div>
+      <div class="topbar-r">
+        <button class="btn btn-out" onclick="toast('Sincronizado!')">↻ Sincronizar</button>
+        <button class="btn btn-gold" onclick="go('agenda',document.querySelectorAll('.nav-item')[2])">+ Agendar</button>
+        <div class="avatar">DO</div>
+      </div>
+    </div>
+
+    <div class="sbar">
+      <div class="dot-live"></div>
+      Online · 3 barbeiros ativos · WhatsApp <strong style="color:var(--green)">+55 65 99211-9835</strong> conectado
+    </div>
+
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div id="p-dashboard" class="panel active">
+        <div class="metrics">
+          <div class="metric acc">
+            <div class="m-lbl">Faturamento Hoje</div>
+            <div class="m-val" style="color:var(--gold)">R$784</div>
+            <div class="m-sub up">▲ 18% vs ontem</div>
+          </div>
+          <div class="metric">
+            <div class="m-lbl">Clientes Hoje</div>
+            <div class="m-val">23</div>
+            <div class="m-sub up">▲ 5 a mais</div>
+          </div>
+          <div class="metric">
+            <div class="m-lbl">Na Fila Agora</div>
+            <div class="m-val" id="d-fila">6</div>
+            <div class="m-sub" style="color:var(--gold)">≈40min espera</div>
+          </div>
+          <div class="metric">
+            <div class="m-lbl">Ticket Médio</div>
+            <div class="m-val">R$34</div>
+            <div class="m-sub dn">▼ 2%</div>
+          </div>
+        </div>
+
+        <div class="g2" style="margin-bottom:16px">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div>
+                <div class="ctitle" style="margin:0">Faturamento Semanal</div>
+                <div style="font-size:11px;color:var(--muted)">Últimos 7 dias</div>
+              </div>
+              <span class="badge bg">+12%</span>
+            </div>
+            <div class="cbar" id="cbar"></div>
+            <div style="display:flex;gap:6px;margin-top:5px" id="clbl"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Serviços Mais Vendidos</div>
+            <div class="brow"><span class="blbl">Corte</span><div class="btrk"><div class="bfil" style="width:45%"></div></div><span class="bval" style="color:var(--gold)">45%</span></div>
+            <div class="brow"><span class="blbl">Barba</span><div class="btrk"><div class="bfil" style="width:22%;background:var(--blue)"></div></div><span class="bval" style="color:var(--blue)">22%</span></div>
+            <div class="brow"><span class="blbl">Combo</span><div class="btrk"><div class="bfil" style="width:14%;background:var(--green)"></div></div><span class="bval" style="color:var(--green)">14%</span></div>
+            <div class="brow"><span class="blbl">Outros</span><div class="btrk"><div class="bfil" style="width:19%;background:#555"></div></div><span class="bval">19%</span></div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="card">
+            <div class="ctitle">Próximos Atendimentos</div>
+            <div class="fi atv"><div class="fpos cut">✂</div><div class="finfo"><div class="fname">Carlos Mendes</div><div class="fdet">Corte + Barba · Lucas</div></div><span class="badge bg">Atendendo</span></div>
+            <div class="fi"><div class="fpos">2</div><div class="finfo"><div class="fname">Ricardo Alves</div><div class="fdet">Corte · João</div></div><span style="font-size:11px;color:var(--muted)">≈15min</span></div>
+            <div class="fi"><div class="fpos">3</div><div class="finfo"><div class="fname">Marcos Lima</div><div class="fdet">Barba · Pedro</div></div><span style="font-size:11px;color:var(--muted)">≈30min</span></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Horários de Pico</div>
+            <div class="brow"><span class="blbl">9h</span><div class="btrk"><div class="bfil" style="width:35%;opacity:.5"></div></div><span class="bval">35%</span></div>
+            <div class="brow"><span class="blbl">11h</span><div class="btrk"><div class="bfil" style="width:90%"></div></div><span class="bval" style="color:var(--gold)">90%</span></div>
+            <div class="brow"><span class="blbl">14h</span><div class="btrk"><div class="bfil" style="width:80%;opacity:.8"></div></div><span class="bval">80%</span></div>
+            <div class="brow"><span class="blbl">17h</span><div class="btrk"><div class="bfil" style="width:85%;opacity:.85"></div></div><span class="bval">85%</span></div>
+            <div class="brow"><span class="blbl">18h</span><div class="btrk"><div class="bfil" style="width:70%;opacity:.7"></div></div><span class="bval">70%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FILA ===== -->
+      <div id="p-fila" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Fila de Espera</div>
+            <div style="font-size:11px;color:var(--muted)">Tempo médio: 22min por cliente</div>
+          </div>
+          <button class="btn btn-gold" onclick="addFila()">+ Adicionar à Fila</button>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:16px;border-color:rgba(201,168,76,.2)">
+              <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Total</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);line-height:1" id="f-total">6</span>
+              <div style="flex:1"></div>
+              <span style="font-size:11px;color:var(--muted)">Máx: <span style="color:var(--gold)">≈55min</span></span>
+            </div>
+            <div id="f-lista">
+              <div class="fi atv"><div class="fpos cut">✂</div><div class="finfo"><div class="fname">Carlos Mendes</div><div class="fdet">Corte + Barba · Lucas · 14:10</div></div><span class="badge bg">Atendendo</span><button class="btn btn-out" style="padding:4px 10px;font-size:11px;margin-left:8px" onclick="concluir(this,'Carlos Mendes')">✓</button></div>
+              <div class="fi"><div class="fpos">2</div><div class="finfo"><div class="fname">Ricardo Alves</div><div class="fdet">Corte · João · 14:05</div></div><span style="font-size:11px;color:var(--muted);margin-right:8px">≈15min</span><span class="badge ba">Aguardando</span></div>
+              <div class="fi"><div class="fpos">3</div><div class="finfo"><div class="fname">Marcos Lima</div><div class="fdet">Barba · Pedro · 14:15</div></div><span style="font-size:11px;color:var(--muted);margin-right:8px">≈28min</span><span class="badge bm">Na fila</span></div>
+              <div class="fi"><div class="fpos">4</div><div class="finfo"><div class="fname">Felipe Santos</div><div class="fdet">Corte · Qualquer · 14:22</div></div><span style="font-size:11px;color:var(--muted);margin-right:8px">≈36min</span><span class="badge bm">Na fila</span></div>
+              <div class="fi"><div class="fpos">5</div><div class="finfo"><div class="fname">André Costa</div><div class="fdet">Combo · Lucas · 14:28</div></div><span style="font-size:11px;color:var(--muted);margin-right:8px">≈44min</span><span class="badge bm">Na fila</span></div>
+              <div class="fi"><div class="fpos">6</div><div class="finfo"><div class="fname">Thiago Reis</div><div class="fdet">Corte · Qualquer · 14:35</div></div><span style="font-size:11px;color:var(--muted);margin-right:8px">≈55min</span><span class="badge bm">Na fila</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:14px">
+              <div class="ctitle">Barbeiros Agora</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8B6914);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0">LC</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Lucas</div><div style="font-size:11px;color:var(--muted)">Ocupado · 12min</div></div><span class="badge ba">Ocupado</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#2060a0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">JO</div><div style="flex:1"><div style="font-size:13px;font-weight:500">João</div><div style="font-size:11px;color:var(--muted)">Ocupado · 8min</div></div><span class="badge ba">Ocupado</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),#2a8a55);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">PE</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Pedro</div><div style="font-size:11px;color:var(--green)">Disponível agora</div></div><span class="badge bg">Livre</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ctitle">WhatsApp Hoje</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--gold)">18</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:12px">Confirmações: 15 · Lembretes: 3</div>
+              <button class="btn btn-out" style="width:100%;font-size:12px" onclick="toast('Lembrete enviado para todos!')">Enviar lembrete geral</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== AGENDA ===== -->
+      <div id="p-agenda" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Agendamentos</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-out">◀</button>
+            <button class="btn btn-out" style="color:var(--gold);border-color:rgba(201,168,76,.4)">Hoje</button>
+            <button class="btn btn-out">▶</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 310px;gap:16px">
+          <div>
+            <div class="tabs">
+              <div class="tab active" onclick="stab(this)">Todos</div>
+              <div class="tab" onclick="stab(this)">Lucas</div>
+              <div class="tab" onclick="stab(this)">João</div>
+              <div class="tab" onclick="stab(this)">Pedro</div>
+            </div>
+            <div id="ag-list">
+              <div class="ag"><span class="ah">09:00</span><span style="flex:1;font-weight:500">Carlos Mendes</span><span style="color:var(--muted);font-size:11px">Corte + Barba · Lucas</span><span class="badge bg">Concluído</span></div>
+              <div class="ag"><span class="ah">09:30</span><span style="flex:1;font-weight:500">Rafael Nunes</span><span style="color:var(--muted);font-size:11px">Corte · João</span><span class="badge bg">Concluído</span></div>
+              <div class="ag"><span class="ah">10:00</span><span style="flex:1;font-weight:500">Gustavo Pires</span><span style="color:var(--muted);font-size:11px">Barba · Pedro</span><span class="badge bg">Concluído</span></div>
+              <div class="ag go"><span class="ah g">14:10</span><span style="flex:1;font-weight:500;color:var(--gold)">Carlos Mendes</span><span style="color:var(--muted);font-size:11px">Combo · Lucas</span><span class="badge ba">Em andamento</span></div>
+              <div class="ag bk"><span class="ah">15:00</span><span style="flex:1;font-weight:500">Ricardo Alves</span><span style="color:var(--muted);font-size:11px">Corte · João</span><span class="badge bb">Confirmado</span></div>
+              <div class="ag bk"><span class="ah">15:30</span><span style="flex:1;font-weight:500">Marcos Lima</span><span style="color:var(--muted);font-size:11px">Barba · Pedro</span><span class="badge bb">Confirmado</span></div>
+              <div class="ag fr" id="slot-livre"><span class="ah">16:00</span><span style="flex:1;color:var(--muted)">— Horário livre —</span><span class="badge bm">Disponível</span></div>
+              <div class="ag bk"><span class="ah">17:00</span><span style="flex:1;font-weight:500">Felipe Santos</span><span style="color:var(--muted);font-size:11px">Corte</span><span class="badge bb">Confirmado</span></div>
+              <div class="ag bk"><span class="ah">17:30</span><span style="flex:1;font-weight:500">André Costa</span><span style="color:var(--muted);font-size:11px">Combo · Lucas</span><span class="badge bb">Confirmado</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);margin-bottom:16px">+ Novo Agendamento</div>
+            <div class="fg"><label class="flbl">Nome do Cliente</label><input class="finp" type="text" placeholder="Nome completo" id="ag-nome"></div>
+            <div class="fg"><label class="flbl">WhatsApp</label><input class="finp" type="text" placeholder="(65) 99999-0000"></div>
+            <div class="fg"><label class="flbl">Barbeiro</label>
+              <select class="fsel">
+                <option>Qualquer</option>
+                <option>Lucas</option>
+                <option>João</option>
+                <option>Pedro</option>
+              </select>
+            </div>
+            <label class="flbl">Serviço</label>
+            <div class="sg">
+              <div class="so sel" onclick="ssel(this)">✂ Corte<br><small style="color:var(--muted)">R$30</small></div>
+              <div class="so" onclick="ssel(this)">🧔 Barba<br><small style="color:var(--muted)">R$25</small></div>
+              <div class="so" onclick="ssel(this)">✂🧔 Combo<br><small style="color:var(--muted)">R$50</small></div>
+              <div class="so" onclick="ssel(this)">✨ Hidrat.<br><small style="color:var(--muted)">R$40</small></div>
+            </div>
+            <div class="fg"><label class="flbl">Horário</label>
+              <select class="fsel">
+                <option>16:00 — Livre</option>
+                <option>18:00</option>
+                <option>18:30</option>
+              </select>
+            </div>
+            <button class="btn btn-gold" style="width:100%;padding:11px" onclick="confirmarAg()">Confirmar Agendamento</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BARBEIROS ===== -->
+      <div id="p-barbeiros" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Barbeiros</div>
+          <button class="btn btn-gold" onclick="toast('Cadastro de novo barbeiro!')">+ Novo Barbeiro</button>
+        </div>
+        <div class="g3" style="margin-bottom:18px">
+          <div class="barb-card">
+            <div class="bav" style="background:linear-gradient(135deg,var(--gold),#8B6914)">LC</div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">Lucas Carvalho</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Cortes clássicos · 40% comissão</div>
+            <span class="badge ba">Ocupado agora</span>
+            <div class="bst">
+              <div><div class="bsv" style="color:var(--gold)">8</div><div class="bsl">Hoje</div></div>
+              <div><div class="bsv">52</div><div class="bsl">Semana</div></div>
+              <div><div class="bsv" style="color:var(--gold)">4.9</div><div class="bsl">Nota</div></div>
+            </div>
+          </div>
+          <div class="barb-card">
+            <div class="bav" style="background:linear-gradient(135deg,var(--blue),#2060a0)">JO</div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">João Oliveira</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Barbas e degradês · 40% comissão</div>
+            <span class="badge ba">Ocupado agora</span>
+            <div class="bst">
+              <div><div class="bsv" style="color:var(--blue)">9</div><div class="bsl">Hoje</div></div>
+              <div><div class="bsv">61</div><div class="bsl">Semana</div></div>
+              <div><div class="bsv" style="color:var(--gold)">4.8</div><div class="bsl">Nota</div></div>
+            </div>
+          </div>
+          <div class="barb-card" style="border-color:rgba(94,203,142,.2)">
+            <div class="bav" style="background:linear-gradient(135deg,var(--green),#2a8a55)">PE</div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">Pedro Souza</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Cortes modernos · 40% comissão</div>
+            <span class="badge bg">Disponível</span>
+            <div class="bst">
+              <div><div class="bsv" style="color:var(--green)">6</div><div class="bsl">Hoje</div></div>
+              <div><div class="bsv">44</div><div class="bsl">Semana</div></div>
+              <div><div class="bsv" style="color:var(--gold)">4.7</div><div class="bsl">Nota</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ctitle">Comparativo Semanal</div>
+          <div class="g3">
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--muted)">Lucas</span><span style="color:var(--gold)">R$1.820 · com. R$728</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:85%;height:100%;background:var(--gold);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--muted)">João</span><span style="color:var(--blue)">R$2.135 · com. R$854</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:100%;height:100%;background:var(--blue);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--muted)">Pedro</span><span style="color:var(--green)">R$1.540 · com. R$616</span></div><div style="height:8px;background:var(--bg3);border-radius:4px"><div style="width:72%;height:100%;background:var(--green);border-radius:4px"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RELATÓRIOS ===== -->
+      <div id="p-relatorios" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Relatórios</div>
+          <div style="display:flex;gap:8px">
+            <select class="fsel" style="width:auto;padding:7px 12px;font-size:12px">
+              <option>Março 2026</option>
+              <option>Fevereiro 2026</option>
+            </select>
+            <button class="btn btn-gold" onclick="exp('completo')">Exportar Tudo</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+          <div class="metric acc"><div class="m-lbl">Faturamento Março</div><div class="m-val">R$9.840</div><div class="m-sub up">▲ 23% vs fev.</div></div>
+          <div class="metric"><div class="m-lbl">Total Clientes</div><div class="m-val">289</div><div class="m-sub up">▲ 31 a mais</div></div>
+          <div class="metric"><div class="m-lbl">Novos Clientes</div><div class="m-val">42</div><div class="m-sub" style="color:var(--blue)">▲ 14.5%</div></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <div class="ctitle">Faturamento Diário</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:4px">Receita por dia do mês</div>
+            <div class="mb">
+              <div class="mbar" style="height:30px"></div>
+              <div class="mbar" style="height:46px"></div>
+              <div class="mbar" style="height:38px"></div>
+              <div class="mbar" style="height:52px;opacity:1"></div>
+              <div class="mbar" style="height:28px;opacity:.5"></div>
+              <div class="mbar" style="height:44px"></div>
+              <div class="mbar" style="height:56px;opacity:1"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('excel-diario')">📊 Baixar Excel</button>
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('pdf-diario')">📄 Baixar CSV</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Desempenho por Barbeiro</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:4px">Faturamento e comissão</div>
+            <div style="display:flex;gap:8px;height:56px;align-items:flex-end;padding:0 8px;margin:12px 0">
+              <div style="flex:1;text-align:center"><div style="height:40px;background:var(--gold);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:4px">Lucas</div></div>
+              <div style="flex:1;text-align:center"><div style="height:52px;background:var(--blue);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:4px">João</div></div>
+              <div style="flex:1;text-align:center"><div style="height:36px;background:var(--green);border-radius:3px 3px 0 0;opacity:.85"></div><div style="font-size:10px;color:var(--muted);margin-top:4px">Pedro</div></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('excel-barbeiro')">📊 Baixar Excel</button>
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('pdf-barbeiro')">📄 Baixar CSV</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Serviços Mais Vendidos</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:10px">Ranking por quantidade</div>
+            <div class="brow" style="font-size:11px"><span class="blbl">Corte</span><div class="btrk"><div class="bfil" style="width:45%"></div></div><span class="bval" style="color:var(--gold)">45%</span></div>
+            <div class="brow" style="font-size:11px"><span class="blbl">Barba</span><div class="btrk"><div class="bfil" style="width:22%;background:var(--blue)"></div></div><span class="bval" style="color:var(--blue)">22%</span></div>
+            <div class="brow" style="font-size:11px"><span class="blbl">Combo</span><div class="btrk"><div class="bfil" style="width:14%;background:var(--green)"></div></div><span class="bval" style="color:var(--green)">14%</span></div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('excel-servicos')">📊 Baixar Excel</button>
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('pdf-servicos')">📄 Baixar CSV</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Histórico de Clientes</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:10px">Todos os atendimentos</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="color:var(--muted)">Carlos Mendes</span><span>8 visitas · R$320</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="color:var(--muted)">Ricardo Alves</span><span>5 visitas · R$175</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0"><span style="color:var(--muted)">Marcos Lima</span><span>3 visitas · R$75</span></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('excel-historico')">📊 Baixar Excel</button>
+              <button class="btn btn-out" style="flex:1;padding:7px;font-size:12px" onclick="exp('pdf-historico')">📄 Baixar CSV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SERVIÇOS ===== -->
+      <div id="p-servicos" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">Serviços</div>
+          <button class="btn btn-gold" onclick="toast('Novo serviço!')">+ Adicionar</button>
+        </div>
+        <div class="card">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:0.5px solid var(--border)">
+                <th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:1px">Serviço</th>
+                <th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase">Duração</th>
+                <th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase">Preço</th>
+                <th style="text-align:left;padding:10px 0;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase">Vendas/mês</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:12px 0;font-weight:500">✂ Corte</td><td style="padding:12px 0;color:var(--muted)">20min</td><td style="padding:12px 0;color:var(--gold)">R$30,00</td><td style="padding:12px 0"><span class="badge bg">130</span></td><td style="padding:12px 0;text-align:right"><button class="btn btn-out" style="padding:4px 10px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:12px 0;font-weight:500">🧔 Barba</td><td style="padding:12px 0;color:var(--muted)">15min</td><td style="padding:12px 0;color:var(--gold)">R$25,00</td><td style="padding:12px 0"><span class="badge bb">63</span></td><td style="padding:12px 0;text-align:right"><button class="btn btn-out" style="padding:4px 10px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:12px 0;font-weight:500">✂🧔 Combo</td><td style="padding:12px 0;color:var(--muted)">35min</td><td style="padding:12px 0;color:var(--gold)">R$50,00</td><td style="padding:12px 0"><span class="badge ba">40</span></td><td style="padding:12px 0;text-align:right"><button class="btn btn-out" style="padding:4px 10px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr style="border-bottom:0.5px solid #222"><td style="padding:12px 0;font-weight:500">✨ Hidratação</td><td style="padding:12px 0;color:var(--muted)">25min</td><td style="padding:12px 0;color:var(--gold)">R$40,00</td><td style="padding:12px 0"><span class="badge bm">18</span></td><td style="padding:12px 0;text-align:right"><button class="btn btn-out" style="padding:4px 10px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+              <tr><td style="padding:12px 0;font-weight:500">🎨 Coloração</td><td style="padding:12px 0;color:var(--muted)">60min</td><td style="padding:12px 0;color:var(--gold)">R$80,00</td><td style="padding:12px 0"><span class="badge bm">12</span></td><td style="padding:12px 0;text-align:right"><button class="btn btn-out" style="padding:4px 10px;font-size:11px" onclick="toast('Editando...')">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== PERMISSÕES ===== -->
+      <div id="p-permissoes" class="panel">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:4px">Permissões de Acesso</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Controle o que cada perfil pode ver</div>
+        <div class="perm-sec">
+          <div style="font-size:14px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="font-size:18px">👤</span>Cliente — só vê</div>
+          <div class="prow"><span>Tela de Agendamento</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Fila de Espera (somente sua posição)</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Barbeiros disponíveis</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Dashboard / faturamento</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Relatórios</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+        <div class="perm-sec">
+          <div style="font-size:14px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>✂</span>Barbeiro — vê parcialmente</div>
+          <div class="prow"><span>Agenda do dia (somente a dele)</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Fila completa</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Seu faturamento e comissão</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Atualizar status de atendimento</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Faturamento dos outros barbeiros</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span style="color:var(--muted)">Relatórios gerais da barbearia</span><div class="tog off" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+        <div class="perm-sec" style="border-color:rgba(201,168,76,.25)">
+          <div style="font-size:14px;font-weight:500;margin-bottom:12px;color:var(--gold);display:flex;align-items:center;gap:8px"><span>👑</span>Dono — acesso total</div>
+          <div class="prow"><span>Dashboard completo com tudo</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Todos os agendamentos</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Faturamento de todos os barbeiros</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Relatórios + exportar Excel/CSV</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Gerenciar barbeiros e serviços</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+          <div class="prow"><span>Configurar WhatsApp Bot</span><div class="tog on" onclick="tog(this)"><div class="tok"></div></div></div>
+        </div>
+      </div>
+
+      <!-- ===== WHATSAPP ===== -->
+      <div id="p-whatsapp" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">WhatsApp Bot</div>
+          <span class="badge bg" style="font-size:12px;padding:5px 14px">Conectado</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">
+          Número: <strong style="color:var(--gold)">+55 65 99211-9835</strong> ·
+          Provider: Z-API (recomendado) · Webhook: <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:11px">POST /api/webhook/whatsapp/zapi</code>
+        </div>
+        <div class="g2">
+          <div>
+            <div class="wa-wrap">
+              <div class="wa-head">
+                <div class="wa-av">BP</div>
+                <div><div class="wa-hn">BarberPro</div><div class="wa-hs">online · 65992119835</div></div>
+              </div>
+              <div class="wa-body" id="wa-chat">
+                <div class="wmsg recv">
+                  Olá! 👋 Bem-vindo à <strong>BarberPro</strong>! 💈<br><br>
+                  Escolha uma opção:<br><br>
+                  1️⃣ Agendar horário<br>
+                  2️⃣ Ver minha fila<br>
+                  3️⃣ Ver barbeiros disponíveis<br>
+                  4️⃣ Cancelar agendamento<br>
+                  5️⃣ Falar com atendente<br><br>
+                  <em>Responda com o número da opção</em>
+                  <div class="wtime">agora ✓✓</div>
+                </div>
+              </div>
+              <div class="wa-inp">
+                <input type="text" id="wa-in" placeholder="Teste: oi, 1, 2, 3, 4, 5, sim, menu..." onkeydown="if(event.key==='Enter')waSend()">
+                <button class="wsend" onclick="waSend()">
+                  <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+                </button>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">
+              Simulação. Em produção, mensagens chegam direto do WhatsApp <strong style="color:var(--txt)">65992119835</strong>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="ctitle">Configurar Link do Site</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:12px">O bot envia este link quando cliente escolhe agendar</div>
+              <input class="finp" type="text" id="link-in" value="https://SEU-SITE.com/agendar" placeholder="https://seu-site.com/agendar">
+              <button class="btn btn-gold" style="width:100%;margin-top:10px;padding:9px;font-size:13px" onclick="salvarLink()">Salvar Link</button>
+            </div>
+            <div class="card">
+              <div class="ctitle">Mensagem Automática do Bot</div>
+              <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:12px;line-height:1.8;border:0.5px solid var(--border)">
+                Olá! 👋 Bem-vindo à <strong>BarberPro</strong>! 💈<br><br>
+                1️⃣ Agendar horário<br>
+                2️⃣ Ver minha fila<br>
+                3️⃣ Ver barbeiros disponíveis<br>
+                4️⃣ Cancelar agendamento<br>
+                5️⃣ Falar com atendente
+              </div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Estatísticas Hoje</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div style="background:var(--bg3);padding:12px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)">94</div><div style="font-size:10px;color:var(--muted)">Msgs recebidas</div></div>
+                <div style="background:var(--bg3);padding:12px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green)">18</div><div style="font-size:10px;color:var(--muted)">Agendamentos</div></div>
+                <div style="background:var(--bg3);padding:12px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--blue)">98%</div><div style="font-size:10px;color:var(--muted)">Uptime</div></div>
+                <div style="background:var(--bg3);padding:12px;border-radius:8px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px">3s</div><div style="font-size:10px;color:var(--muted)">Resp. média</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
